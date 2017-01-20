@@ -49,7 +49,7 @@ bool IVHD::writeFooter() //
 	memset(footer.footerReserved, 0, 427);
 	if ((vhdFile.tellp()) < 0x200)
 	{
-		footer.checksum = calculate_checksum((unsigned char*)&footer, sizeof(vhdFooter));
+		footer.checksum = _byteswap_ulong(calculate_checksum((unsigned char*)&footer, sizeof(vhdFooter)));
 	}
 
 	if ((vhdFile.write(reinterpret_cast<char *>(&footer), sizeof(vhdFooter))))
@@ -85,7 +85,7 @@ bool IVHD::writeDynamicHeader(void) //dynamic disk only
 	
 	memset(dynamicHeader.dynamicHeaderReserved, 0, 256);
 
-	dynamicHeader.checksum = calculate_checksum((unsigned char*)&dynamicHeader, sizeof(vhdDynamicHeader));
+	dynamicHeader.checksum = _byteswap_ulong(calculate_checksum((unsigned char*)&dynamicHeader, sizeof(vhdDynamicHeader)));
 
 	if ((vhdFile.write(reinterpret_cast<char *>((&dynamicHeader)), sizeof(vhdDynamicHeader))))
 		return true;
@@ -170,5 +170,5 @@ unsigned int IVHD::calculate_checksum(const unsigned char * data, size_t dsize)
 	{
 		checksum += data[i];
 	}
-	return checksum;
+	return ~checksum;
 }
