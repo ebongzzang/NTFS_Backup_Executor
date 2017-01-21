@@ -6,15 +6,19 @@ using std::string;
 
 int main(void)
 {
-	IVHD * vhd = new IVHD(VHD_DISK_TYPE_DYNAMIC, "C:\\test.vhd", 1024);
+	IVHD * vhd = new IVHD(VHD_DISK_TYPE_DYNAMIC, "C:\\test2.vhd", 1024);
+	
 	//if (!(vhd->InitVHD()))
-	//	return -1;
-	//if (!(vhd->writeFooter()))
-	//	return -1;
-	//if (!(vhd->writeDynamicHeader()))
-	//	return -1;
-	//vhd->WriteBatMap();
-	//vhd->writeFooter();
+		//	return -1;
+	//	if (!(vhd->writeFooter()))
+			//	return -1;
+		//	if (!(vhd->writeDynamicHeader()))
+				//	return -1;
+				vhd->InitVHD();
+	vhd->writeFooter();
+	vhd->writeDynamicHeader();
+	vhd->WriteBatMap();
+	vhd->writeFooter();
 	return 0;
 }
 

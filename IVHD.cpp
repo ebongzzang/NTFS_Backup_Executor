@@ -67,7 +67,7 @@ bool IVHD::writeDynamicHeader(void) //dynamic disk only
 	{
 		std::cout << "Dynamic header position error." << std::endl;
 		return false;
-		
+
 	}
 
 	memcpy(dynamicHeader.cookie, VHD_HEADER_COOKIE, sizeof(dynamicHeader.cookie));
@@ -101,7 +101,6 @@ bool IVHD::WriteBatMap()
 	//std::cout << converBytetoMB(maxSize) << std::endl;
 	//std::cout << convertEndian(dynamicHeader.table_entries) << std::endl;
 	blockalloctable.resize(convertEndian(dynamicHeader.table_entries));
-
 	blockalloctable.assign(convertEndian(dynamicHeader.table_entries),static_cast<unsigned long>(0xFFFFFFFF));
 
 	for (auto &x : blockalloctable)
