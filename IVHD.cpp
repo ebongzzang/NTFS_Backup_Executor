@@ -27,7 +27,6 @@ bool IVHD::writeFooter() //
 		return false;
 	}
 	
-
 	memcpy(footer.cookie, VHD_FOOTER_COOKIE, sizeof(footer.cookie));
 	footer.features = _byteswap_ulong(VHD_FEATURES_RESERVED);
 	footer.version = _byteswap_ulong(VHD_VERSION);

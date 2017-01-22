@@ -8,17 +8,34 @@ int main(void)
 {
 	IVHD * vhd = new IVHD(VHD_DISK_TYPE_DYNAMIC, "C:\\test2.vhd", 1024);
 	
-	//if (!(vhd->InitVHD()))
-		//	return -1;
-	//	if (!(vhd->writeFooter()))
-			//	return -1;
-		//	if (!(vhd->writeDynamicHeader()))
-				//	return -1;
-				vhd->InitVHD();
+	//if ((vhd->InitVHD()))
+	//		return -1;
+	//	if ((vhd->writeFooter()))
+	//			return -1;
+	//	if ((vhd->writeDynamicHeader()))
+	//				return -1;
+
+	vhd->WriteBatMap();
+	//if (!(vhd->writeFooter()))
+	//	return -1;
+	vhd->InitVHD();
 	vhd->writeFooter();
 	vhd->writeDynamicHeader();
 	vhd->WriteBatMap();
 	vhd->writeFooter();
+ 	ifstream hi("\\\\..\\PhysicalDrive2", std::ios::binary);
+//	ofstream hello("C:\\hello", std::ios::binary);
+//	hi.seekg(510,std::ios::beg)
+//	std::copy(std::istreambuf_iterator<char>(hi), std::istreambuf_iterator<char>(), std::ostreambuf_iterator<char>(hello));
+	std::vector<char> buffer ((std::istreambuf_iterator<char>( hi)), (std::istreambuf_iterator<char>()));
+	for (std::vector<char>::iterator it = buffer.begin(); it != buffer.end(); ++it)
+	{
+		std::cout << *it << std::endl;
+	}
+	
+	// read binary data from file
+
+
 	return 0;
 }
 
