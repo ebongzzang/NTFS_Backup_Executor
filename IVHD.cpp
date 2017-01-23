@@ -2,7 +2,7 @@
 #define convertMBtoByte(n) ((n)*(1024)*(1024))
 #define converBytetoMB(n) ((n)/(1024)/(1024))
 
-IVHD::IVHD(VhdType _backupType, const char * _absPath, unsigned long long _maxSizeMB) //Get attribute
+IVHD::IVHD(VhdType _backupType, const char * _absPath, unsigned long _maxSizeMB) //Get attribute
 	:backupType(_backupType), absPath(_absPath), maxSize(convertMBtoByte(_maxSizeMB))
 {
 	
@@ -100,8 +100,8 @@ bool IVHD::WriteBatMap()
 {
 	//std::cout << converBytetoMB(maxSize) << std::endl;
 	//std::cout << convertEndian(dynamicHeader.table_entries) << std::endl;
-	blockalloctable.resize(convertEndian(dynamicHeader.table_entries));
-	blockalloctable.assign(convertEndian(dynamicHeader.table_entries),static_cast<unsigned long>(0xFFFFFFFF));
+	blockalloctable.resize(_byteswap_ulong(dynamicHeader.table_entries));
+	blockalloctable.assign(_byteswap_ulong(dynamicHeader.table_entries),static_cast<unsigned long>(0xFFFFFFFF));
 
 	for (auto &x : blockalloctable)
 	{

@@ -25,12 +25,11 @@ class IVHD
 public:
 	//std::iostream * InitVHD(VhdType type, unsigned int maxSize,  );
 	IVHD(VhdType _backupType, const char * 
-		, unsigned long long _maxSize);
+		, unsigned long _maxSize);
 	bool InitVHD();
 	bool writeFooter();
 	bool writeDynamicHeader();
 	bool WriteBatMap();
-	bool WriteTailFooter();
 	ofstream * getVHDHandle();
 	~IVHD();
 private:
@@ -89,7 +88,7 @@ private:
 	void * temparray;
 	std::array <unsigned long, 2560> blockalloctable2; 
 	std::vector <unsigned long> blockalloctable;
-	unsigned long long maxSize;
+	unsigned long maxSize;
 	unsigned int calculate_checksum(const unsigned char * data, size_t dsize);
 	unsigned int cal_chs(void);
 };

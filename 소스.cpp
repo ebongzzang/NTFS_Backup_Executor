@@ -236,7 +236,7 @@
 //	overlapped.Offset = offset.LowPart;
 //	overlapped.OffsetHigh = offset.HighPart;
 //
-//	if (!ReadFile(hdevice, buffer, source_diskgeometry.BytesPerSector, NULL, &overlapped))
+//	if(!ReadFile(hdevice, buffer, source_diskgeometry.BytesPerSector, NULL, &overlapped))
 //	{
 //		err = GetLastError();
 //		if (err == ERROR_HANDLE_EOF)
