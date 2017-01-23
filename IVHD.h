@@ -1,3 +1,8 @@
+#ifndef I_VHD
+
+#define I_VHD
+
+
 #include "stdafx.h"
 #include <vector>
 #include <array>
@@ -87,7 +92,6 @@ private:
 	unsigned long long maxSize;
 	unsigned int calculate_checksum(const unsigned char * data, size_t dsize);
 	unsigned int cal_chs(void);
-
-	
-
 };
+
+#endif // !IVHD

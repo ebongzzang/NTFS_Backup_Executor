@@ -1,6 +1,7 @@
 #include "IVHD.h"
 #define convertMBtoByte(n) ((n)*(1024)*(1024))
 #define converBytetoMB(n) ((n)/(1024)/(1024))
+
 IVHD::IVHD(VhdType _backupType, const char * _absPath, unsigned long long _maxSizeMB) //Get attribute
 	:backupType(_backupType), absPath(_absPath), maxSize(convertMBtoByte(_maxSizeMB))
 {
@@ -32,7 +33,7 @@ bool IVHD::writeFooter() //
 	footer.version = _byteswap_ulong(VHD_VERSION);
 	footer.dataOffset = _byteswap_uint64(sizeof(vhdFooter)); //indicate dynamicHeader offset
 	footer.timeStamp = _byteswap_ulong(((unsigned int)time(NULL))); //unixTime
-	memcpy(footer.creatorApp, VHD_CREATOR_TOOL, sizeof(footer.creatorApp));
+	memcpy(footer.creatorApp, VHD_CREATOR_TOOL, sizeof(footer.creatorApp)); //plan
 	footer.creatorVersion = _byteswap_ulong(VHD_CREATOR_VERSION);
 	footer.creatorOs = _byteswap_ulong(VHD_CREATOR_OS);
 	footer.originalSize = _byteswap_uint64(maxSize);
@@ -106,6 +107,7 @@ bool IVHD::WriteBatMap()
 	{
 		vhdFile.write(reinterpret_cast<char *>(&x), sizeof(unsigned long));
 	}
+
 	return true;
 	
 }
