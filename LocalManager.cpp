@@ -52,6 +52,7 @@ bool LocalManager::setDiskHandle()
 }
 char * LocalManager::readMBR() //double pointer
 {
+	disk_offset.QuadPart = 0;
 	if (!SetFilePointerEx(diskHandle, disk_offset, NULL, FILE_BEGIN))
 	{
 		std::cout << "filePointer error" << GetLastError() << std::endl;
