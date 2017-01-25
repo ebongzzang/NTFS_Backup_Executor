@@ -26,5 +26,7 @@
 #define VHD_FOOTER_COOKIE "conectix"
 #define VHD_HEADER_COOKIE "cxsparse"
 
+#define convertMBtoByte(n) ((n)*(1024)*(1024))
+#define converBytetoMB(n) ((n)/(1024)/(1024))
 
 #endif

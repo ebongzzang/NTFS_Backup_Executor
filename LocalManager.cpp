@@ -25,6 +25,9 @@ LocalManager::LocalManager(std::string _driveLetter) //example: C
 	tempString = "\\\\.\\PhysicalDrive" + std::to_string(diskExtents.Extents[0].DiskNumber);
 	tempWstring = s2ws(tempString);
 	drive = tempWstring;
+
+	CloseHandle(handle);
+
 }
 
 LocalManager::~LocalManager()
