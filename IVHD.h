@@ -16,7 +16,6 @@ public:
 	bool writeVHDHeader();
 	bool writeMirrorFooter();
 
-
 	~IVHD();
 private:
 	enumVhdType vhdType;
