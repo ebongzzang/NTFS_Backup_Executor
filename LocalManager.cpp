@@ -68,8 +68,13 @@ char * LocalManager::readMBR() //double pointer
 		std::cout << "readfile error" << GetLastError() << std::endl;
 		return nullptr;
 	}
-
-	return readBuffer;
+	/*GET_LENGTH_INFORMATION length;
+	DWORD count;
+	DeviceIoControl(diskHandle, IOCTL_DISK_GET_DRIVE_GEOMETRY, NULL, 0, &length, sizeof(GET_LENGTH_INFORMATION),&count,NULL);
+	std::cout << "gem error" << GetLastError() <<std::endl;
+	std::cout << length.Length.QuadPart << std::endl;
+	*/
+ 	return readBuffer;
 
 	//ofstream mbrtest;
 	//mbrtest.open("C:\\hi.mbr", std::ios::binary);
