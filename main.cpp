@@ -35,7 +35,7 @@ int main(void)
 	//{
 	//	std::cout << readBuffer1[i] << std::endl;
 	//}
-	HANDLE hi = CreateFile(L"\\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy26", READ_CONTROL | WRITE_OWNER | WRITE_DAC | GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	HANDLE hi = CreateFile(L"\\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy29", READ_CONTROL | WRITE_OWNER | WRITE_DAC | GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	
 	if (hi == INVALID_HANDLE_VALUE)
 	{
@@ -51,7 +51,7 @@ int main(void)
 	uint32_t bitmapFileCount=0;
 	DWORD bytesReturned, bytesWrited;
 
-	bitmapSize = BITMAP_CHUNK_SIZE + (sizeof(LARGE_INTEGER) * 2);
+	bitmapSize = BITMAP_CHUNK_SIZE + sizeof(LARGE_INTEGER) * 2;
 
 	bitmapResult = new VOLUME_BITMAP_BUFFER[bitmapSize];
 	HANDLE file = CreateFile(L"\\\\?\\E:\\hi.bit", GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_ALWAYS, 0, NULL);
@@ -110,10 +110,10 @@ int main(void)
 		infile.seekg(0, std::ios::beg);
 		
 		std::vector<BYTE> vec;
-
+		
 		// reserve capacity
 		vec.reserve(fileSize);
-
+		std::cout << "filesize" << fileSize << std::endl;
 		std::vector <unsigned int> bitmapVector;  //stored non-used cluster offset Vector
 		bitmapVector.reserve(fileSize);
 
@@ -121,42 +121,68 @@ int main(void)
 		
 		vec.insert(vec.begin(),std::istream_iterator<BYTE>(infile),std::istream_iterator<BYTE>());
 		std::vector<BYTE>::iterator it = vec.begin();
-		for ( ; it != vec.end(); ++it)
+		unsigned int temp;
+		for ( ; it != vec.end(); it++)
 		{
 			std::bitset<8> bitset(*it); // 1byte(8bit)
-			for (std::size_t i = 0; i < bitset.size(); ++i) 
+			for (std::size_t i = 0; i < bitset.size(); i++) 
 			{
 	
-				if (bitset[i] == 1)
+				if (bitset.test(i))
 				{  
-					bitmapVector.push_back((((it - vec.begin()) * 8) + i));
+					temp = (((it - vec.begin()) * 8) + i);
+					
+					bitmapVector.push_back(temp);
 					//current byte * sizeof(byte) + bitset index
-
-					//need hash
-
+					//hash
+				}
+				else
+				{
+					continue;
 				}
 			}
 		}
 
-		LARGE_INTEGER asdf;
-		asdf.QuadPart = bitmapVector.front()*4096; //cluster size
+		
 		DWORD count;
+		
+		LARGE_INTEGER asdf;
+		asdf.QuadPart = 0; //cluster size
+
+		if (!SetFilePointerEx(hi, asdf, NULL, FILE_BEGIN)) //set filepointer on Start location
+		std::cout << "first file set error" << GetLastError() << std::endl;
+
 		std::vector<unsigned int>::iterator it2 = bitmapVector.begin();
-		for ( ;it2 != bitmapVector.end(); ++it2 )
+		LARGE_INTEGER newoffset;
+		for ( ; it2 != bitmapVector.end(); ++it2 )
 		{
-			if (!SetFilePointerEx(hi, asdf, NULL, FILE_BEGIN))
+			if (!SetFilePointerEx(hi, asdf, &newoffset, FILE_CURRENT))
 			{
+
 				std::cout << "set pointer error" << GetLastError() << std::endl;
-				std::cout << "value *it:" << *it << std::endl;
+	
+				std::cout << "value *it:" << *it2 << std::endl;
 				std::cout << "asdf.quad" << asdf.QuadPart << std::endl;
 				Sleep(3000);
+			} 
+			if (std::next(it2, 1) != bitmapVector.end())
+			{
+				auto temp = std::next(it2, 1);
+				asdf.QuadPart = (*temp - *it2) * 512;
+
 			}
-			if (!ReadFile(hi, readBuffer1, 4096, &count, 0))
+			else
+				break;
+
+
+			if (!ReadFile(hi, readBuffer1, 4096 , &count, 0))
 			std::cout << "read copy" << GetLastError() << std::endl;
 
-			asdf.QuadPart = ((*it) * 4096); //cluster size
 			if (!WriteFile(rawfile, readBuffer1, 4096, &count, NULL))
 				std::cout << "write copy" << GetLastError() << std::endl;
+		
+
+
 		}
 					
 
