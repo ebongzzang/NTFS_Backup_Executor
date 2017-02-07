@@ -18,13 +18,19 @@
     <ClInclude Include="IVHD.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="LocalManager.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="VHD.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="BackupExecutor.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Bitmap.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="VSS.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,10 +41,16 @@
     <ClCompile Include="IVHD.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="LocalManager.cpp">
+    <ClCompile Include="VHD.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="VHD.cpp">
+    <ClCompile Include="BackupExecutor.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Bitmap.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="VSS.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>

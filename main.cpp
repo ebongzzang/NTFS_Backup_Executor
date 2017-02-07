@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "IVHD.h"
-#include "LocalManager.h"
+#include "BackupExecutor.h"
 #include <memory>
 #include <string>
 #include <boost/utility/binary.hpp>
 #include <bitset>
 #include <sstream>
 #define BITMAP_CHUNK_SIZE 32*1024 
-#define GET_LCN_FROM_BITMAP(i) (((i)/(0x20)))
+
 #define NOT_USED_CLUSTER 4096 *8
 using std::ifstream;
 using std::ofstream;
@@ -24,18 +24,21 @@ int main(void)
 		return false;
 	if (!vhd->writeMirrorFooter())
 		return false;
+
 	char * readBuffer1 = new char[4096];
 
-	LocalManager * manager = new LocalManager("C");
+	BackupExecutor * executor = new BackupExecutor("C");
 
-	manager->setDiskHandle();
+	executor->setDiskHandle();
+
 	//readBuffer1 = manager->readMBR();
 
 	//for (int i = 0; i < 512; i++)
 	//{
 	//	std::cout << readBuffer1[i] << std::endl;
 	//}
-	HANDLE hi = CreateFile(L"\\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy29", READ_CONTROL | WRITE_OWNER | WRITE_DAC | GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+
+	HANDLE hi = CreateFile(L"\\\\?\\GLOBALROOT\\Device\\HarddiskVolumeShadowCopy30", READ_CONTROL | WRITE_OWNER | WRITE_DAC | GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	
 	if (hi == INVALID_HANDLE_VALUE)
 	{
@@ -48,7 +51,6 @@ int main(void)
 	VOLUME_BITMAP_BUFFER * bitmapResult;
 
 	uint32_t bitmapSize;
-	uint32_t bitmapFileCount=0;
 	DWORD bytesReturned, bytesWrited;
 
 	bitmapSize = BITMAP_CHUNK_SIZE + sizeof(LARGE_INTEGER) * 2;
@@ -100,9 +102,8 @@ int main(void)
 	
 	LARGE_INTEGER readoffset;
 	readoffset.QuadPart = 0;
-	std::ifstream infile("E:\\hi.bit", std::ios::binary);
+	std::ifstream infile("E:\\hi.bit");
 
-		infile.unsetf(std::ios::skipws);
 		std::streampos fileSize;
 
 		infile.seekg(0, std::ios::end);
@@ -113,32 +114,29 @@ int main(void)
 		
 		// reserve capacity
 		vec.reserve(fileSize);
-		std::cout << "filesize" << fileSize << std::endl;
 		std::vector <unsigned int> bitmapVector;  //stored non-used cluster offset Vector
-		bitmapVector.reserve(fileSize);
+		bitmapVector.reserve(fileSize*8);
 
 		// read the data:
 		
 		vec.insert(vec.begin(),std::istream_iterator<BYTE>(infile),std::istream_iterator<BYTE>());
 		std::vector<BYTE>::iterator it = vec.begin();
 		unsigned int temp;
-		for ( ; it != vec.end(); it++)
+
+		for ( ; it != vec.end(); ++it)
 		{
-			std::bitset<8> bitset(*it); // 1byte(8bit)
-			for (std::size_t i = 0; i < bitset.size(); i++) 
+	
+			std::bitset<8> bitset((*it)); // 1byte(8bit)
+			for (std::size_t i = bitset.size()-1; i > 0; i--)
 			{
 	
-				if (bitset.test(i))
+				if (bitset[i]==1)
 				{  
 					temp = (((it - vec.begin()) * 8) + i);
 					
 					bitmapVector.push_back(temp);
 					//current byte * sizeof(byte) + bitset index
 					//hash
-				}
-				else
-				{
-					continue;
 				}
 			}
 		}
@@ -154,6 +152,7 @@ int main(void)
 
 		std::vector<unsigned int>::iterator it2 = bitmapVector.begin();
 		LARGE_INTEGER newoffset;
+
 		for ( ; it2 != bitmapVector.end(); ++it2 )
 		{
 			if (!SetFilePointerEx(hi, asdf, &newoffset, FILE_CURRENT))
@@ -164,27 +163,34 @@ int main(void)
 				std::cout << "value *it:" << *it2 << std::endl;
 				std::cout << "asdf.quad" << asdf.QuadPart << std::endl;
 				Sleep(3000);
-			} 
+			}
+
+			if (!ReadFile(hi, readBuffer1, 4096, &count, 0))
+				std::cout << "read copy" << GetLastError() << std::endl;
+
+			if (!WriteFile(rawfile, readBuffer1, 4096, &count, NULL))
+				std::cout << "write copy" << GetLastError() << std::endl;
+
 			if (std::next(it2, 1) != bitmapVector.end())
 			{
 				auto temp = std::next(it2, 1);
-				asdf.QuadPart = (*temp - *it2) * 512;
+
+				if (*temp - *it2 != 1)
+				{
+					asdf.QuadPart = ((*temp - *it2) * 4096)-4096;
+				}
 
 			}
 			else
 				break;
 
 
-			if (!ReadFile(hi, readBuffer1, 4096 , &count, 0))
-			std::cout << "read copy" << GetLastError() << std::endl;
-
-			if (!WriteFile(rawfile, readBuffer1, 4096, &count, NULL))
-				std::cout << "write copy" << GetLastError() << std::endl;
+			
 		
 
 
 		}
-					
+				
 
 	
 		
