@@ -1,7 +1,11 @@
 #include "BackupExecutor.h"
 #include <memory>
 #include <string>
-BackupExecutor::BackupExecutor(std::string _driveLetter) //example: C
+#include "stringToolset.h"
+
+BackupExecutor::BackupExecutor(long _backupKey, std::string _driveLetter,
+	BackupStyle _backupStyle,BackupType _BackupType)
+	: backupKey(_backupKey), backupStyle(_backupStyle), backupType(_BackupType)//example: C
 {
 	std::wstring uncPath = convertDriveLetter(_driveLetter);
 
@@ -13,7 +17,7 @@ BackupExecutor::BackupExecutor(std::string _driveLetter) //example: C
 		std::cout << "Convert DriveLetter to UNC path failed.  " << GetLastError() << std::endl;
 	}
 
-	determinePhysicalDisk(handle);
+	Physicaldisk = determinePhysicalDisk(handle);
 	CloseHandle(handle);
 }
 
@@ -33,7 +37,7 @@ HANDLE * BackupExecutor::getDiskHandle()
 }
 bool BackupExecutor::setDiskHandle()
 {
-	diskHandle = CreateFile(disk.c_str(), GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	diskHandle = CreateFile(Physicaldisk.c_str(), GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 
 	if (diskHandle == INVALID_HANDLE_VALUE)
 	{
@@ -70,42 +74,5 @@ char * BackupExecutor::readMBR() //double pointer
 	//mbrtest.open("C:\\hi.mbr", std::ios::binary);
 	//mbrtest.write(readBuffer, 512);
 
-}
-std::wstring BackupExecutor::s2ws(const std::string& s)
-{
-	int len;
-	int slength = (int)s.length() + 1;
-	len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
-	wchar_t* buf = new wchar_t[len];
-	MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
-	std::wstring r(buf);
-	delete[] buf;
-	return r;
-}
-std::wstring BackupExecutor::convertDriveLetter(std::string dLetter)
-//Convert driveLetter to UNC path
-{
-	std::string tempString;
-	std::wstring tempWstring;
-
-	tempString =+ "\\\\.\\" + dLetter + ":";
-	tempWstring = s2ws(tempString);
-	return tempWstring;
-
-}
-
-void BackupExecutor::determinePhysicalDisk(HANDLE drive) 	
-// determine parameter's Physical disk.
-{
-	VOLUME_DISK_EXTENTS diskExtents;
-	DWORD dwSize;
-
-	if (!DeviceIoControl(drive, IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, &diskExtents, sizeof(diskExtents), &dwSize, NULL))
-		std::cout << "GET_VOLUME_DISK_EXTENTS ERROR! " << GetLastError() << std::endl;
-
-	std::string tempString = "\\\\.\\PhysicalDrive" + std::to_string(diskExtents.Extents[0].DiskNumber);
-	std::wstring tempWstring = s2ws(tempString);
-
-	disk = tempWstring;
 }
 

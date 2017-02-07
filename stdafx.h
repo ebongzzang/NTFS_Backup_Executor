@@ -1,6 +1,5 @@
 #pragma once
 #ifndef STDAFX
-
 #define STDAFX
 
 #include <iostream>

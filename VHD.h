@@ -1,3 +1,4 @@
+#pragma once
 #ifndef VHD_FILE
 
 #define VHD_FILE

@@ -1,9 +1,7 @@
-#include "stdafx.h"
 #include "IVHD.h"
 #include "BackupExecutor.h"
 #include <memory>
 #include <string>
-#include <boost/utility/binary.hpp>
 #include <bitset>
 #include <sstream>
 #define BITMAP_CHUNK_SIZE 32*1024 
@@ -27,9 +25,9 @@ int main(void)
 
 	char * readBuffer1 = new char[4096];
 
-	BackupExecutor * executor = new BackupExecutor("C");
+	//BackupExecutor * executor = new BackupExecutor("C");
 
-	executor->setDiskHandle();
+	//executor->setDiskHandle();
 
 	//readBuffer1 = manager->readMBR();
 

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="BackupExecutor.cpp">
+      <Filter>소스</Filter>
+    </ClCompile>
+    <ClCompile Include="Bitmap.cpp">
+      <Filter>소스</Filter>
+    </ClCompile>
+    <ClCompile Include="IVHD.cpp">
+      <Filter>소스</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>소스</Filter>
+    </ClCompile>
+    <ClCompile Include="VHD.cpp">
+      <Filter>소스</Filter>
+    </ClCompile>
+    <ClCompile Include="VSSClass.cpp">
+      <Filter>소스</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BackupExecutor.h">
+      <Filter>헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="Bitmap.h">
+      <Filter>헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="IVHD.h">
+      <Filter>헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="PlanBCommon.h">
+      <Filter>헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="VHD.h">
+      <Filter>헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="VSSClass.h">
+      <Filter>헤더</Filter>
+    </ClInclude>
+    <ClInclude Include="stringToolset.h">
+      <Filter>헤더</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="소스">
+      <UniqueIdentifier>{a3f1c04c-5cdc-4592-8d44-348dbbc54b93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더">
+      <UniqueIdentifier>{472ae27b-92cf-4d6f-be9d-14c6210814ad}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
