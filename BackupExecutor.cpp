@@ -7,7 +7,7 @@ BackupExecutor::BackupExecutor(long _backupKey, std::string _driveLetter,
 	BackupStyle _backupStyle,BackupType _BackupType)
 	: backupKey(_backupKey), backupStyle(_backupStyle), backupType(_BackupType)//example: C
 {
-	std::wstring uncPath = convertDriveLetter(_driveLetter);
+	std::wstring uncPath = convertDriveLettertoUNC(_driveLetter);
 
 	HANDLE handle = CreateFile(uncPath.c_str(), GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 	//unique_ptr?

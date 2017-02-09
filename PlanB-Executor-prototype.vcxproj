@@ -154,21 +154,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Bitmap.cpp" />
+    <ClCompile Include="Backup.cpp" />
     <ClCompile Include="IVHD.cpp" />
     <ClCompile Include="BackupExecutor.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="VSSClass.cpp" />
     <ClCompile Include="VHD.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bitmap.h" />
+    <ClInclude Include="backup.h" />
     <ClInclude Include="IVHD.h" />
     <ClInclude Include="BackupExecutor.h" />
     <ClInclude Include="PlanBCommon.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="stringToolset.h" />
-    <ClInclude Include="VSSClass.h" />
     <ClInclude Include="VHD.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

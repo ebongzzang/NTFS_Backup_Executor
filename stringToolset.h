@@ -15,7 +15,7 @@
 		delete[] buf;
 		return r;
 	}
-	std::wstring convertDriveLetter(std::string dLetter)
+	std::wstring convertDriveLettertoUNC(std::string dLetter)
 		//Convert driveLetter to UNC path
 	{
 		std::string tmpString;
