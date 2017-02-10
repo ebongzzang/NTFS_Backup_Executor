@@ -14,7 +14,10 @@
       <Filter>소스</Filter>
     </ClCompile>
     <ClCompile Include="Backup.cpp">
-      <Filter>소스</Filter>
+      <Filter>소스\Backup</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemBackup.cpp">
+      <Filter>소스\Backup</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,11 +36,11 @@
     <ClInclude Include="stdafx.h">
       <Filter>헤더\common</Filter>
     </ClInclude>
-    <ClInclude Include="stringToolset.h">
-      <Filter>헤더\common</Filter>
-    </ClInclude>
     <ClInclude Include="backup.h">
-      <Filter>헤더\common</Filter>
+      <Filter>헤더\Backup</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemBackup.h">
+      <Filter>헤더\Backup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +52,12 @@
     </Filter>
     <Filter Include="헤더\common">
       <UniqueIdentifier>{3c27f7cc-40f3-4d1e-977a-69f0f7889829}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더\Backup">
+      <UniqueIdentifier>{560e99ee-d025-4094-a05f-c5ee113878b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스\Backup">
+      <UniqueIdentifier>{a28aafd8-b74a-4028-8371-73f6d1420ba7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
