@@ -16,18 +16,18 @@ using std::string;
 int main(void)
 {
 
-	IVHD *vhd = new IVHD(VHD_DISK_TYPE_DYNAMIC, "C:\\test2.vhd", 1024); //vhdtype, path, maxsize(mb)
+	//IVHD *vhd = new IVHD(VHD_DISK_TYPE_DYNAMIC, "C:\\test2.vhd", 1024); //vhdtype, path, maxsize(mb)
 
-	if (!vhd->InitVHD())
-		return false;
+	//if (!vhd->InitVHD())
+	//	return false;
 
-	if (!vhd->writeVHDHeader())
-		return false;
+	//if (!vhd->writeVHDHeader())
+	//	return false;
 
-	if (!vhd->writeMirrorFooter())
-		return false;
+	//if (!vhd->writeMirrorFooter())
+	//	return false;
 
-	char * readBuffer1 = new char[4096];
+	//char * readBuffer1 = new char[4096];
 
 	BackupExecutor * executor = new BackupExecutor(01,"C",PlanB::BackupStyle::FULL,PlanB::BackupType::System,FALSE,FALSE);
 

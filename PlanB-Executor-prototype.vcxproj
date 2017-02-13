@@ -158,6 +158,7 @@
     <ClCompile Include="IVHD.cpp" />
     <ClCompile Include="BackupExecutor.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Restore.cpp" />
     <ClCompile Include="SystemBackup.cpp" />
     <ClCompile Include="VHD.cpp" />
   </ItemGroup>
@@ -166,6 +167,7 @@
     <ClInclude Include="IVHD.h" />
     <ClInclude Include="BackupExecutor.h" />
     <ClInclude Include="PlanBCommon.h" />
+    <ClInclude Include="Restore.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SystemBackup.h" />
     <ClInclude Include="VHD.h" />

@@ -6,8 +6,6 @@ Backup::Backup(long _backupKey, std::string _sourcePath, std::string _destinatio
 	bool _isCompressed, bool _isSplited) : backupKey(_backupKey), sourcePath(_sourcePath),
 	destinationPath(_destinationPath), isCompressed(_isCompressed), isSplited(_isSplited)
 {
-	
-	
 
 }
 
@@ -50,8 +48,8 @@ VSS_SNAPSHOT_PROP Backup::takeSnapshot()
 	if (!CreateVssBackupComponentsInternal_I || !VssFreeSnapshotPropertiesInternal_I)
 		abort(); // Handle error
 
-	if (!SUCCEEDED(CreateVssBackupComponentsInternal_I(&backupComponents)))
-		abort();		//intialize backup components.
+	if (!SUCCEEDED(CreateVssBackupComponentsInternal_I(&backupComponents))) //intialize backup components.
+		abort();		
 
 	if (!SUCCEEDED(backupComponents->InitializeForBackup()))
 		abort();
@@ -103,6 +101,7 @@ std::wstring Backup::strTowstr(const std::string& s)
 	delete[] buf;
 	return r;
 }
+
 std::wstring Backup::convertDriveLettertoUNC(std::string dLetter)
 //Convert driveLetter to UNC path
 {

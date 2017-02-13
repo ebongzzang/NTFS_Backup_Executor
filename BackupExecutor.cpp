@@ -1,7 +1,6 @@
 #include "BackupExecutor.h"
 #include <memory>
 #include <string>
-#include "stringToolset.h"
 
 BackupExecutor::BackupExecutor(long _backupKey, std::string _driveLetter,
 	BackupStyle _backupStyle,BackupType _BackupType, bool _isCompressed, bool _isSplited)//example: C
@@ -14,6 +13,10 @@ BackupExecutor::BackupExecutor(long _backupKey, std::string _driveLetter,
 
 
 }
+//BackupExecutor::exec() 
+//{
+//	pBackup->exec(parameter);
+//}
 
 BackupExecutor::~BackupExecutor()
 {

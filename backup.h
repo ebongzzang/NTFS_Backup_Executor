@@ -7,6 +7,7 @@
 #include <vss.h>
 #include <vswriter.h>
 #include <vsbackup.h>
+#include <iostream>
 
 class Backup
 {

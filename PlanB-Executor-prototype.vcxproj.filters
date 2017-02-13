@@ -19,6 +19,9 @@
     <ClCompile Include="SystemBackup.cpp">
       <Filter>소스\Backup</Filter>
     </ClCompile>
+    <ClCompile Include="Restore.cpp">
+      <Filter>소스\Restore</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackupExecutor.h">
@@ -42,6 +45,9 @@
     <ClInclude Include="SystemBackup.h">
       <Filter>헤더\Backup</Filter>
     </ClInclude>
+    <ClInclude Include="Restore.h">
+      <Filter>헤더\Restore</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="소스">
@@ -58,6 +64,12 @@
     </Filter>
     <Filter Include="소스\Backup">
       <UniqueIdentifier>{a28aafd8-b74a-4028-8371-73f6d1420ba7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스\Restore">
+      <UniqueIdentifier>{e6b0c1fd-7407-463e-b754-3a0e1243d865}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더\Restore">
+      <UniqueIdentifier>{fa68c263-27bd-4592-93cc-591a251cc5da}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
