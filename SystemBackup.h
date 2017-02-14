@@ -8,23 +8,7 @@ class SystemBackup : public Backup
 {
 public:
 	SystemBackup(long _backupKey, std::string _sourcePath, std::string _destinationPath,
-		bool _isCompressed, bool _isSplited) : Backup(_backupKey, _sourcePath, _destinationPath, _isCompressed, _isSplited)
-	{
-		std::wstring uncPath = convertDriveLettertoUNC(sourcePath);
-		//unc -> physicaldisk 
-
-		HANDLE handle = CreateFile(uncPath.c_str(), GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-		//unique_ptr?
-
-		if (handle == INVALID_HANDLE_VALUE)
-		{
-			std::cout << "Convert DriveLetter to UNC path failed." << GetLastError() << std::endl;
-		}
-
-		physicalDisk = determinePhysicalDisk(handle);
-
-		CloseHandle(handle);
-	}
+	bool _isCompressed, bool _isSplited);
 	virtual PlanB::JobStatus exec();
 //	virtual PlanB::JobStatus cancel();
 	virtual ~SystemBackup();

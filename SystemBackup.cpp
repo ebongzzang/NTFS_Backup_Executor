@@ -12,6 +12,25 @@
 #include <sstream>
 #define BITMAP_CHUNK_SIZE 32*1024 
 
+SystemBackup::SystemBackup(long _backupKey, std::string _sourcePath, std::string _destinationPath,
+	bool _isCompressed, bool _isSplited) : Backup(_backupKey, _sourcePath, _destinationPath, _isCompressed, _isSplited)
+{
+	std::wstring uncPath = convertDriveLettertoUNC(sourcePath);
+	//unc -> physicaldisk 
+
+	HANDLE handle = CreateFile(uncPath.c_str(), GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	//unique_ptr?
+
+	if (handle == INVALID_HANDLE_VALUE)
+	{
+		std::cout << "Convert DriveLetter to UNC path failed." << GetLastError() << std::endl;
+	}
+
+	physicalDisk = determinePhysicalDisk(handle);
+
+	CloseHandle(handle);
+}
+
 SystemBackup::~SystemBackup()
 {
 	delete[] mbrBuffer;
@@ -20,11 +39,11 @@ SystemBackup::~SystemBackup()
 
 PlanB::JobStatus SystemBackup::exec()
 {
-	if (!readMBR())
+	/*if (!readMBR())
 	{
 		std::cout << "ReadMBR Failed." << std::endl;
 		return PlanB::JobStatus::FAILED;
-	}
+	}*/
 
 	VSS_SNAPSHOT_PROP vssProp;
 	vssProp = takeSnapshot();
@@ -225,25 +244,26 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 	{
 
 		std::bitset<8> bitset((*fileIt)); // 1byte(8bit)
-		for (i = bitset.size() - 1; i >= 0; i--) //Vector Element(byte) to binary(bitset)
+		for (i = bitset.size() - 1; i  >= 0;  i--) //Vector Element(byte) to binary(bitset)
 		{
 
 			if (bitset[i] == 1)
 			{
-				clusterIndex = (((fileIt - readFileVector.begin()) * 8) + i);
+				clusterIndex = (((fileIt - readFileVector.begin()) * 8) + ((bitset.size()-1) - i));
 				usedBitVector.push_back(clusterIndex);
-				// byte offset * sizeof(byte) + bitset index = cluster number
 			}
 
 			else if (bitset[i] == 0)
 			{
-				clusterIndex = (((fileIt - readFileVector.begin()) * 8) + i);
+				clusterIndex = (((fileIt - readFileVector.begin()) * 8) + ((bitset.size() - 1) - i));
 				nonUsedBitVector.push_back(clusterIndex);
 			}
 		}
 	}
 	usedBitVector.shrink_to_fit();
 	nonUsedBitVector.shrink_to_fit();
+
+	/* need data sort */
 	std::sort(usedBitVector.begin(), usedBitVector.end());
 	std::sort(nonUsedBitVector.begin(), nonUsedBitVector.end());
 
