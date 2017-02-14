@@ -28,9 +28,12 @@ int main(void)
 	//	return false;
 
 	//char * readBuffer1 = new char[4096];
+	clock_t begin, end;
+	begin = clock();
+	BackupExecutor * executor = new BackupExecutor(01,"O",PlanB::BackupStyle::FULL,PlanB::BackupType::System,FALSE,FALSE);
+	end = clock();
 
-	BackupExecutor * executor = new BackupExecutor(01,"C",PlanB::BackupStyle::FULL,PlanB::BackupType::System,FALSE,FALSE);
-
+	std::cout << "수행시간 " << ((end - begin) / CLOCKS_PER_SEC) << "초" << std::endl;
 
 
 	//executor->setDiskHandle();

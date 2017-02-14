@@ -9,6 +9,7 @@
 #include <bitset>
 #include <array>
 #include <iomanip>
+#include <sstream>
 #define BITMAP_CHUNK_SIZE 32*1024 
 
 SystemBackup::~SystemBackup()
@@ -27,7 +28,7 @@ PlanB::JobStatus SystemBackup::exec()
 
 	VSS_SNAPSHOT_PROP vssProp;
 	vssProp = takeSnapshot();
-	
+
 	vssHandle = CreateFile(vssProp.m_pwszSnapshotDeviceObject, READ_CONTROL | WRITE_OWNER | WRITE_DAC | GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	//open vssfolder
 
@@ -37,8 +38,35 @@ PlanB::JobStatus SystemBackup::exec()
 		return PlanB::JobStatus::FAILED;
 	}
 	std::wstring filename = writeBitmap();
-
+	
 	exportResultFile(filename);
+
+	HANDLE VSSDISK2 = CreateFile(L"\\\\.\\O:", GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
+	HANDLE DISK2 = CreateFile(L"test.rec", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING , 0, NULL);
+	//TODO: \\Device\HardDisk
+	LARGE_INTEGER inputFileSize2;
+	LARGE_INTEGER tempoffset2;
+	LARGE_INTEGER newoffset2;
+	tempoffset2.QuadPart = 0;
+	GetFileSizeEx(DISK2, &inputFileSize2);
+
+	char readBuffer2[65536];
+	DeviceIoControl(VSSDISK2, FSCTL_DISMOUNT_VOLUME, NULL, 0, NULL, 0, &count, NULL);// OVERLAPPED structure
+	DeviceIoControl(VSSDISK2, FSCTL_LOCK_VOLUME, NULL, 0, NULL, 0, &count, NULL);
+	
+	for (int j = 0; j < (inputFileSize2.QuadPart / CLUSTER_SIZE) / 16; j++)
+	{
+		if (!ReadFile(DISK2, readBuffer2, CLUSTER_SIZE * 16, &count, NULL))
+			std::cout << "failed" << std::endl;
+		if (!WriteFile(VSSDISK2, readBuffer2, CLUSTER_SIZE * 16, &count, NULL))
+			std::cout << "write file error" << GetLastError() << std::endl;
+	}
+	DeviceIoControl(VSSDISK2, FSCTL_UNLOCK_VOLUME, NULL, 0, NULL, 0, &count, NULL);
+
+	CloseHandle(VSSDISK2);
+	CloseHandle(DISK2);
+		
+
 
 
 	return PlanB::JobStatus::SUCCESS;
@@ -126,7 +154,7 @@ std::wstring SystemBackup::writeBitmap()
 	bitmapResultBuf = new VOLUME_BITMAP_BUFFER[bitmapSize];
 	bitmapStart.StartingLcn.QuadPart = 0;
 
-	while (TRUE)//Read NTFS bitmap per 32kb
+	while (1)//Read NTFS bitmap per 32kb
 	{
 		bool bitmap = DeviceIoControl(vssHandle, FSCTL_GET_VOLUME_BITMAP, &bitmapStart, sizeof(STARTING_LCN_INPUT_BUFFER), bitmapResultBuf, bitmapSize, &bytesReturned, NULL);
 
@@ -145,24 +173,25 @@ std::wstring SystemBackup::writeBitmap()
 		}
 
 		bytesReturned -= sizeof(LARGE_INTEGER) * 2;
+
 		WriteFile(bitmapOutHandle, bitmapResultBuf->Buffer, bytesReturned, &count, NULL);
 		//Write Bitmap.
 
 		if (bitmap)
 		{
 			break;
-			
 		}
 
 		/* Update the read offset for next request */
 		bitmapStart.StartingLcn.QuadPart += bytesReturned * 8;
 	}
+
 	return filename;
 }
 void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 {
 
-	std::ifstream bitmapFile(bitmapFileName);
+	std::ifstream bitmapFile(bitmapFileName, std::ios::binary);
 
 	std::streampos fileSize;
 
@@ -174,9 +203,9 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 	readFileVector.reserve(fileSize);
 	// reserve capacity
 
-	std::vector <unsigned int> usedBitVector;  //used cluster vector
+	std::vector <int> usedBitVector;  //used cluster vector
 	usedBitVector.reserve(fileSize * 8);
-	std::vector <unsigned int> nonUsedBitVector;
+	std::vector <int> nonUsedBitVector;
 	nonUsedBitVector.reserve(fileSize * 8);
 
 	LARGE_INTEGER readoffset;
@@ -187,10 +216,10 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 	/* read the data*/
 	readFileVector.shrink_to_fit();
 
-	unsigned int clusterIndex;
+	int clusterIndex;
 	int i;
 	/* if bitmap each bit == 1, put into usedBitVector */
-	std::cout << readFileVector.size() << std::endl;
+	
 	for (std::vector<BYTE>::iterator fileIt = readFileVector.begin();
 		fileIt != readFileVector.end(); ++fileIt) //iterate bitmap Vector
 	{
@@ -206,7 +235,7 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 				// byte offset * sizeof(byte) + bitset index = cluster number
 			}
 
-			else
+			else if (bitset[i] == 0)
 			{
 				clusterIndex = (((fileIt - readFileVector.begin()) * 8) + i);
 				nonUsedBitVector.push_back(clusterIndex);
@@ -215,10 +244,14 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 	}
 	usedBitVector.shrink_to_fit();
 	nonUsedBitVector.shrink_to_fit();
-	std::cout << "used vector size" << usedBitVector.size() << std::endl;
-	Sleep(3000);
-	std::cout << "non-used vector size" << nonUsedBitVector.size() << std::endl;
-	Sleep(3000);
+	std::sort(usedBitVector.begin(), usedBitVector.end());
+	std::sort(nonUsedBitVector.begin(), nonUsedBitVector.end());
+
+	std::cout << "used vector size " << usedBitVector.size() << std::endl;
+	std::cout << "non-used vector size " << nonUsedBitVector.size() << std::endl;
+	std::cout << "used last element" << usedBitVector.back() << std::endl;
+	std::cout << "non last element2" << nonUsedBitVector.back() << std::endl;
+
 	LARGE_INTEGER vssOffset;
 	vssOffset.QuadPart = 0;
 
@@ -229,7 +262,7 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 	char readBuffer[4096];
 	HANDLE rawfile = CreateFile(L"result.raw", GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_ALWAYS, 0, NULL);
 
-	for (std::vector<unsigned int>::iterator bitIt = usedBitVector.begin();
+	for (std::vector<int>::iterator bitIt = usedBitVector.begin();
 		bitIt != usedBitVector.end(); ++bitIt)
 	{
 
@@ -252,10 +285,6 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 			{
 				vssOffset.QuadPart = ((*nextOffset - *bitIt) * CLUSTER_SIZE) - CLUSTER_SIZE;
 				/* ((next used offset - current used offset) * 4096) - 4096 */
-
-	/*			nonUsedBitVector.push_back((*bitIt));
-				nonUsedBitVector.push_back((*nextOffset - *bitIt));*/
-
 			}
 
 		}
@@ -263,51 +292,68 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 		else
 			break;
 	}
-
-
-
-	std::ofstream nonUsed("non_used.bitmap",std::ios::binary);
-	
-	for (std::vector<unsigned int>::iterator fileIt5 = nonUsedBitVector.begin();
-		fileIt5 != nonUsedBitVector.end(); ++fileIt5) //iterate bitmap Vector
+		auto f = fopen("non_used.bitmap", "w+");
+		for(std::vector<int>::iterator bitIt3 = nonUsedBitVector.begin();
+			bitIt3 != nonUsedBitVector.end(); ++bitIt3)
 	{
-		nonUsed.write(reinterpret_cast<const char *>(&*fileIt5),sizeof(unsigned int));
+			fprintf(f, "%d ", *bitIt3);
 	}
-	std::ifstream bitmapFile2("non_used.bitmap", std::ios::binary);
-	std::streampos fileSize2;
 
+
+	std::ifstream bitmapFile2("non_used.bitmap");
 	bitmapFile2.seekg(0, std::ios::end);
-	fileSize2 = bitmapFile2.tellg();
+	auto fileSize2 = bitmapFile2.tellg();
 	bitmapFile2.seekg(0, std::ios::beg);
 
-	std::vector<unsigned int> readFileVector2; //stored bitmap file 
-	readFileVector2.reserve(fileSize2 * 8);
+	std::string test;
+	std::vector<int>readfileVector;
+	readfileVector.reserve(fileSize2 * 8);
+	int temp;
 
-	readFileVector2.insert(readFileVector2.begin(), std::istream_iterator<char>(bitmapFile2), std::istream_iterator<char>());
-	readFileVector2.shrink_to_fit();
+	while (std::getline(bitmapFile2, test))
+	{
+		std::istringstream iss(test);
 
-	HANDLE DISK = CreateFile(L"test.rec", GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
-	HANDLE VSSDISK = CreateFile(L"result.raw", GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+		while (iss >> temp)
+		{
+			readfileVector.push_back(temp);
+		}
+	}
+
+	std::sort(readfileVector.begin(), readfileVector.end());
+	HANDLE DISK = CreateFile(L"test.rec", GENERIC_READ | GENERIC_WRITE , FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
+	HANDLE VSSDISK = CreateFile(L"result.raw", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 	LARGE_INTEGER inputFileSize;
 	LARGE_INTEGER tempoffset;
 	LARGE_INTEGER newoffset;
 	tempoffset.QuadPart = 0;
 	GetFileSizeEx(VSSDISK, &inputFileSize);
 	int j = 0;
-	for (int i = 0; ((inputFileSize.QuadPart / CLUSTER_SIZE) + nonUsedBitVector.size()) > i; i++)
-	{
-		if (i == static_cast<unsigned int>(readFileVector2.at(j)))
+	char readBuffer2[4096];
+	for (int k = 0; (usedBitVector.size() + readfileVector.size()) > k; k++)
+	{			//
+		if (k == (readfileVector.at(j)))
 		{
-			memset(readBuffer, NULL, CLUSTER_SIZE);
-			tempoffset.QuadPart = 4096;
+			memset(readBuffer2,0, CLUSTER_SIZE);
+			tempoffset.QuadPart = CLUSTER_SIZE;
 			SetFilePointerEx(VSSDISK, tempoffset, &newoffset, FILE_CURRENT);
+
+			if (readfileVector.at(j) == readfileVector.back())
+			{
+				std::cout << readfileVector.back() << std::endl;
+				std::cout << "index " << j << std::endl; //unused
+				std::cout << "kkkk" << k << std::endl; //file lcn
+				continue;
+			}
 			j++;
+
 			if (!WriteFile(DISK, readBuffer, CLUSTER_SIZE, &count, NULL))
 				std::cout << "write file error" << GetLastError() << std::endl;
 		}
 		else
 		{
-			ReadFile(VSSDISK, readBuffer, CLUSTER_SIZE, &count, NULL);
+			if(!ReadFile(VSSDISK, readBuffer, CLUSTER_SIZE, &count, NULL))
+				std::cout << "vssdisk readerror error" << GetLastError() << std::endl;
 			if (!WriteFile(DISK, readBuffer, CLUSTER_SIZE, &count, NULL))
 				std::cout << "write file error" << GetLastError() << std::endl;
 		}
