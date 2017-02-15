@@ -7,7 +7,7 @@ BackupExecutor::BackupExecutor(long _backupKey, std::string _driveLetter,
 {
 	if (_BackupType == PlanB::BackupType::System)
 	{ 
-		pBackup = new SystemBackup(01, "D", "C:\\", TRUE, TRUE);
+		pBackup = new SystemBackup(01, "Q", "C:\\", TRUE, TRUE);
 		pBackup->exec();
 	}
 

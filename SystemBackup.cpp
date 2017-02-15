@@ -60,30 +60,30 @@ PlanB::JobStatus SystemBackup::exec()
 	
 	exportResultFile(filename);
 
-	HANDLE VSSDISK2 = CreateFile(L"\\\\.\\O:", GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
-	HANDLE DISK2 = CreateFile(L"test.rec", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING , 0, NULL);
-	//TODO: \\Device\HardDisk
-	LARGE_INTEGER inputFileSize2;
-	LARGE_INTEGER tempoffset2;
-	LARGE_INTEGER newoffset2;
-	tempoffset2.QuadPart = 0;
-	GetFileSizeEx(DISK2, &inputFileSize2);
+	//HANDLE VSSDISK2 = CreateFile(L"\\\\.\\O:", GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
+	//HANDLE DISK2 = CreateFile(L"test.rec", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING , 0, NULL);
+	////TODO: \\Device\HardDisk
+	//LARGE_INTEGER inputFileSize2;
+	//LARGE_INTEGER tempoffset2;
+	//LARGE_INTEGER newoffset2;
+	//tempoffset2.QuadPart = 0;
+	//GetFileSizeEx(DISK2, &inputFileSize2);
 
-	char readBuffer2[65536];
-	DeviceIoControl(VSSDISK2, FSCTL_DISMOUNT_VOLUME, NULL, 0, NULL, 0, &count, NULL);// OVERLAPPED structure
-	DeviceIoControl(VSSDISK2, FSCTL_LOCK_VOLUME, NULL, 0, NULL, 0, &count, NULL);
-	
-	for (int j = 0; j < (inputFileSize2.QuadPart / CLUSTER_SIZE) / 16; j++)
-	{
-		if (!ReadFile(DISK2, readBuffer2, CLUSTER_SIZE * 16, &count, NULL))
-			std::cout << "failed" << std::endl;
-		if (!WriteFile(VSSDISK2, readBuffer2, CLUSTER_SIZE * 16, &count, NULL))
-			std::cout << "write file error" << GetLastError() << std::endl;
-	}
-	DeviceIoControl(VSSDISK2, FSCTL_UNLOCK_VOLUME, NULL, 0, NULL, 0, &count, NULL);
+	//char readBuffer2[65536];
+	//DeviceIoControl(VSSDISK2, FSCTL_DISMOUNT_VOLUME, NULL, 0, NULL, 0, &count, NULL);// OVERLAPPED structure
+	//DeviceIoControl(VSSDISK2, FSCTL_LOCK_VOLUME, NULL, 0, NULL, 0, &count, NULL);
+	//
+	//for (int j = 0; j < (inputFileSize2.QuadPart / CLUSTER_SIZE) / 16; j++)
+	//{
+	//	if (!ReadFile(DISK2, readBuffer2, CLUSTER_SIZE * 16, &count, NULL))
+	//		std::cout << "failed" << std::endl;
+	//	if (!WriteFile(VSSDISK2, readBuffer2, CLUSTER_SIZE * 16, &count, NULL))
+	//		std::cout << "write file error" << GetLastError() << std::endl;
+	//}
+	//DeviceIoControl(VSSDISK2, FSCTL_UNLOCK_VOLUME, NULL, 0, NULL, 0, &count, NULL);
 
-	CloseHandle(VSSDISK2);
-	CloseHandle(DISK2);
+	//CloseHandle(VSSDISK2);
+	//CloseHandle(DISK2);
 		
 
 
@@ -249,13 +249,13 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 
 			if (bitset[i] == 1)
 			{
-				clusterIndex = (((fileIt - readFileVector.begin()) * 8) + ((bitset.size()-1) - i));
+				clusterIndex = ((((fileIt - readFileVector.begin()) * 8) + ((bitset.size()-1) ) )- i);
 				usedBitVector.push_back(clusterIndex);
 			}
 
 			else if (bitset[i] == 0)
 			{
-				clusterIndex = (((fileIt - readFileVector.begin()) * 8) + ((bitset.size() - 1) - i));
+				clusterIndex = ((((fileIt - readFileVector.begin()) * 8) + ((bitset.size() - 1))) - i);
 				nonUsedBitVector.push_back(clusterIndex);
 			}
 		}
@@ -270,9 +270,10 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 	std::cout << "used vector size " << usedBitVector.size() << std::endl;
 	std::cout << "non-used vector size " << nonUsedBitVector.size() << std::endl;
 	std::cout << "used last element" << usedBitVector.back() << std::endl;
-	std::cout << "non last element2" << nonUsedBitVector.back() << std::endl;
+	std::cout << "non last element2 " << nonUsedBitVector.back() << std::endl;
 
 	LARGE_INTEGER vssOffset;
+	LARGE_INTEGER deb_off;
 	vssOffset.QuadPart = 0;
 
 	if (!SetFilePointerEx(vssHandle, vssOffset, NULL, FILE_BEGIN)) //Set filepointer on start location
@@ -286,7 +287,7 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 		bitIt != usedBitVector.end(); ++bitIt)
 	{
 
-		if (!SetFilePointerEx(vssHandle, vssOffset, 0, FILE_CURRENT))
+		if (!SetFilePointerEx(vssHandle, vssOffset, &deb_off, FILE_CURRENT))
 		{
 			std::cout << "set pointer error" << GetLastError() << std::endl;
 		}
@@ -306,19 +307,28 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 				vssOffset.QuadPart = ((*nextOffset - *bitIt) * CLUSTER_SIZE) - CLUSTER_SIZE;
 				/* ((next used offset - current used offset) * 4096) - 4096 */
 			}
-
+			else 
+			{
+				vssOffset.QuadPart = 0;
+				//if sequence bit, din't move file pointer
+			}
+		}
+		else
+		{
+			break;
 		}
 
-		else
-			break;
+
 	}
+
 		auto f = fopen("non_used.bitmap", "w+");
 		for(std::vector<int>::iterator bitIt3 = nonUsedBitVector.begin();
 			bitIt3 != nonUsedBitVector.end(); ++bitIt3)
 	{
 			fprintf(f, "%d ", *bitIt3);
 	}
-
+		//TODO: don't use together both c-style, c++ style io
+		fclose(f);
 
 	std::ifstream bitmapFile2("non_used.bitmap");
 	bitmapFile2.seekg(0, std::ios::end);
@@ -326,21 +336,18 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 	bitmapFile2.seekg(0, std::ios::beg);
 
 	std::string test;
-	std::vector<int>readfileVector;
-	readfileVector.reserve(fileSize2 * 8);
-	int temp;
+	std::vector<int>readnonfileVector;
+	readnonfileVector.reserve(fileSize2 * 8);
+		
 
-	while (std::getline(bitmapFile2, test))
-	{
-		std::istringstream iss(test);
+		int temp;
 
-		while (iss >> temp)
+		while (bitmapFile2 >> temp)
 		{
-			readfileVector.push_back(temp);
+			readnonfileVector.push_back(temp);
 		}
-	}
 
-	std::sort(readfileVector.begin(), readfileVector.end());
+	std::sort(readnonfileVector.begin(), readnonfileVector.end());
 	HANDLE DISK = CreateFile(L"test.rec", GENERIC_READ | GENERIC_WRITE , FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
 	HANDLE VSSDISK = CreateFile(L"result.raw", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 	LARGE_INTEGER inputFileSize;
@@ -348,26 +355,25 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 	LARGE_INTEGER newoffset;
 	tempoffset.QuadPart = 0;
 	GetFileSizeEx(VSSDISK, &inputFileSize);
+
 	int j = 0;
 	char readBuffer2[4096];
-	for (int k = 0; (usedBitVector.size() + readfileVector.size()) > k; k++)
-	{			//
-		if (k == (readfileVector.at(j)))
+	memset(readBuffer2, 0, CLUSTER_SIZE);
+	tempoffset.QuadPart = CLUSTER_SIZE;
+
+	for (int k = 0; (usedBitVector.size() + readnonfileVector.size()) > k; k++)
+	{			
+		if (k == (readnonfileVector.at(j)))
 		{
-			memset(readBuffer2,0, CLUSTER_SIZE);
-			tempoffset.QuadPart = CLUSTER_SIZE;
+	
 			SetFilePointerEx(VSSDISK, tempoffset, &newoffset, FILE_CURRENT);
 
-			if (readfileVector.at(j) == readfileVector.back())
-			{
-				std::cout << readfileVector.back() << std::endl;
-				std::cout << "index " << j << std::endl; //unused
-				std::cout << "kkkk" << k << std::endl; //file lcn
+			if (j  == readnonfileVector.size()-1)
 				continue;
-			}
+
 			j++;
 
-			if (!WriteFile(DISK, readBuffer, CLUSTER_SIZE, &count, NULL))
+			if (!WriteFile(DISK, readBuffer2, CLUSTER_SIZE, &count, NULL))
 				std::cout << "write file error" << GetLastError() << std::endl;
 		}
 		else
