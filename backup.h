@@ -12,31 +12,32 @@
 class Backup
 {
 public:
-	Backup(long _backupKey, std::string _sourcePath, std::string _destinationPath,
+	Backup(long _backupKey, std::wstring _sourcePath, std::wstring _destinationPath,
 		bool _isCompressed, bool _isSplited);
 
 	VSS_SNAPSHOT_PROP takeSnapshot();
 
-	//virtual void changeJournal(); /*Not Implemented */
-	virtual PlanB::JobStatus exec() = 0;
-//	virtual PlanB::JobStatus cancel() = 0;/*Not Implemented */
-	//virtual void compress(); /*Not Implemented */
-//	virtual void split(); /*Not Implemented */
+	//virtual void changeJournal();  /*Not Implemented */
+	virtual PlanB::BackupResult*  exec() = 0;
+	virtual PlanB::JobStatus cancel() = 0; /*Not Implemented */
+	virtual void compress(); /*Not Implemented */
+	virtual void split(); /*Not Implemented */
 	virtual ~Backup();
 
 protected:
 	long backupKey;
-	std::string sourcePath;
-	std::string destinationPath;
+	std::wstring sourcePath;
+	std::wstring destinationPath;
 	bool isCompressed;
 	bool isSplited;
+	PlanB::BackupResult * result;
 
 
 	std::wstring strTowstr(const std::string& s);
 	std::wstring convertDriveLettertoUNC(std::string dLetter);
+	string wstrTostr(const std::wstring& wstr);
 
 private:
-
 };
 
 

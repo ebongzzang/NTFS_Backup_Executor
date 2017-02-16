@@ -10,13 +10,19 @@
 #include <array>
 #include <iomanip>
 #include <sstream>
+
 #define BITMAP_CHUNK_SIZE 32*1024 
 
-SystemBackup::SystemBackup(long _backupKey, std::string _sourcePath, std::string _destinationPath,
+SystemBackup::SystemBackup(long _backupKey, std::wstring _sourcePath, std::wstring _destinationPath,
 	bool _isCompressed, bool _isSplited) : Backup(_backupKey, _sourcePath, _destinationPath, _isCompressed, _isSplited)
 {
-	std::wstring uncPath = convertDriveLettertoUNC(sourcePath);
-	//unc -> physicaldisk 
+	result = new PlanB::BackupResult;
+
+	std::wstring uncPath = convertDriveLettertoUNC(wstrTostr(sourcePath));
+
+	wstring string_to_convert;
+
+	
 
 	HANDLE handle = CreateFile(uncPath.c_str(), GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
 	//unique_ptr?
@@ -35,15 +41,19 @@ SystemBackup::~SystemBackup()
 {
 	delete[] mbrBuffer;
 	CloseHandle(physicalDiskHandle);
+	CloseHandle(vssHandle);
+	delete result;
+
 }
 
-PlanB::JobStatus SystemBackup::exec()
+PlanB::BackupResult* SystemBackup::exec()
 {
-	/*if (!readMBR())
+	if (!readMBR())
 	{
 		std::cout << "ReadMBR Failed." << std::endl;
-		return PlanB::JobStatus::FAILED;
-	}*/
+		result->status = PlanB::JobStatus::FAILED;
+		return result;
+	}
 
 	VSS_SNAPSHOT_PROP vssProp;
 	vssProp = takeSnapshot();
@@ -54,44 +64,21 @@ PlanB::JobStatus SystemBackup::exec()
 	if (vssHandle == INVALID_HANDLE_VALUE)
 	{
 		std::cout << "shadow copy handle error:" << GetLastError() << std::endl;
-		return PlanB::JobStatus::FAILED;
+		result->status = PlanB::JobStatus::FAILED;
+		return result;;
 	}
 	std::wstring filename = writeBitmap();
 	
 	exportResultFile(filename);
 
-	//HANDLE VSSDISK2 = CreateFile(L"\\\\.\\O:", GENERIC_READ | GENERIC_WRITE | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
-	//HANDLE DISK2 = CreateFile(L"test.rec", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING , 0, NULL);
-	////TODO: \\Device\HardDisk
-	//LARGE_INTEGER inputFileSize2;
-	//LARGE_INTEGER tempoffset2;
-	//LARGE_INTEGER newoffset2;
-	//tempoffset2.QuadPart = 0;
-	//GetFileSizeEx(DISK2, &inputFileSize2);
+	result->status = PlanB::JobStatus::SUCCESS;
+	result->backupKey = backupKey;
+	result->backupTargetPath = destinationPath;
+	result->resultFilePath = 
+	result->style = PlanB::BackupStyle::FULL;
+	result->type = PlanB::BackupType::System;
 
-	//char readBuffer2[65536];
-	//DeviceIoControl(VSSDISK2, FSCTL_DISMOUNT_VOLUME, NULL, 0, NULL, 0, &count, NULL);// OVERLAPPED structure
-	//DeviceIoControl(VSSDISK2, FSCTL_LOCK_VOLUME, NULL, 0, NULL, 0, &count, NULL);
-	//
-	//for (int j = 0; j < (inputFileSize2.QuadPart / CLUSTER_SIZE) / 16; j++)
-	//{
-	//	if (!ReadFile(DISK2, readBuffer2, CLUSTER_SIZE * 16, &count, NULL))
-	//		std::cout << "failed" << std::endl;
-	//	if (!WriteFile(VSSDISK2, readBuffer2, CLUSTER_SIZE * 16, &count, NULL))
-	//		std::cout << "write file error" << GetLastError() << std::endl;
-	//}
-	//DeviceIoControl(VSSDISK2, FSCTL_UNLOCK_VOLUME, NULL, 0, NULL, 0, &count, NULL);
-
-	//CloseHandle(VSSDISK2);
-	//CloseHandle(DISK2);
-		
-
-
-
-	return PlanB::JobStatus::SUCCESS;
-
-
-	
+	return result;
 }
 
 bool SystemBackup::readMBR() //TODO : get Sector Size dynamically
@@ -148,6 +135,11 @@ std::wstring SystemBackup::determinePhysicalDisk(HANDLE drive)
 
 	return strTowstr(tmpString);
 }
+PlanB::JobStatus SystemBackup::cancel()
+{
+	/* Not Implemented*/
+	return PlanB::JobStatus::CANCLED;
+}
 
 std::wstring SystemBackup::writeBitmap()
 {
@@ -173,7 +165,7 @@ std::wstring SystemBackup::writeBitmap()
 	bitmapResultBuf = new VOLUME_BITMAP_BUFFER[bitmapSize];
 	bitmapStart.StartingLcn.QuadPart = 0;
 
-	while (1)//Read NTFS bitmap per 32kb
+	while (1) //Read NTFS bitmap per 32kb
 	{
 		bool bitmap = DeviceIoControl(vssHandle, FSCTL_GET_VOLUME_BITMAP, &bitmapStart, sizeof(STARTING_LCN_INPUT_BUFFER), bitmapResultBuf, bitmapSize, &bytesReturned, NULL);
 
@@ -188,7 +180,6 @@ std::wstring SystemBackup::writeBitmap()
 			{
 				return false;
 			}
-
 		}
 
 		bytesReturned -= sizeof(LARGE_INTEGER) * 2;
@@ -224,19 +215,14 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 
 	std::vector <int> usedBitVector;  //used cluster vector
 	usedBitVector.reserve(fileSize * 8);
-	std::vector <int> nonUsedBitVector;
+	std::vector <int> nonUsedBitVector; //non-used cluster vector
 	nonUsedBitVector.reserve(fileSize * 8);
-
-	LARGE_INTEGER readoffset;
-	readoffset.QuadPart = 0;
-
 
 	readFileVector.insert(readFileVector.begin(), std::istream_iterator<BYTE>(bitmapFile), std::istream_iterator<BYTE>());
 	/* read the data*/
 	readFileVector.shrink_to_fit();
 
 	int clusterIndex;
-	int i;
 	/* if bitmap each bit == 1, put into usedBitVector */
 	
 	for (std::vector<BYTE>::iterator fileIt = readFileVector.begin();
@@ -244,7 +230,7 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 	{
 
 		std::bitset<8> bitset((*fileIt)); // 1byte(8bit)
-		for (i = bitset.size() - 1; i  >= 0;  i--) //Vector Element(byte) to binary(bitset)
+		for (int i = bitset.size() - 1; i  >= 0;  i--) //each Vector Element(byte) to binary(bit)
 		{
 
 			if (bitset[i] == 1)
@@ -267,10 +253,6 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 	std::sort(usedBitVector.begin(), usedBitVector.end());
 	std::sort(nonUsedBitVector.begin(), nonUsedBitVector.end());
 
-	std::cout << "used vector size " << usedBitVector.size() << std::endl;
-	std::cout << "non-used vector size " << nonUsedBitVector.size() << std::endl;
-	std::cout << "used last element" << usedBitVector.back() << std::endl;
-	std::cout << "non last element2 " << nonUsedBitVector.back() << std::endl;
 
 	LARGE_INTEGER vssOffset;
 	LARGE_INTEGER deb_off;
@@ -281,7 +263,7 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 
 
 	char readBuffer[4096];
-	HANDLE rawfile = CreateFile(L"result.raw", GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_ALWAYS, 0, NULL);
+	HANDLE rawfile = CreateFile(destinationPath.c_str(), GENERIC_WRITE | GENERIC_READ, FILE_SHARE_DELETE | FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_ALWAYS, 0, NULL);
 
 	for (std::vector<int>::iterator bitIt = usedBitVector.begin();
 		bitIt != usedBitVector.end(); ++bitIt)
@@ -298,13 +280,17 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 		if (!WriteFile(rawfile, readBuffer, CLUSTER_SIZE, &count, NULL))
 			std::cout << "bitmap file write fail" << GetLastError() << std::endl;
 
+		if (std::prev(usedBitVector.end(), 10) == bitIt)
+		{
+			std::cout << "test" << std::endl;
+		}
+
 		if (std::next(bitIt, 1) != usedBitVector.end())
 		{
 			auto nextOffset = std::next(bitIt, 1);
 
 			if (*nextOffset - *bitIt != 1)
-			{
-				vssOffset.QuadPart = ((*nextOffset - *bitIt) * CLUSTER_SIZE) - CLUSTER_SIZE;
+			{				vssOffset.QuadPart = ((*nextOffset - *bitIt) * CLUSTER_SIZE) - CLUSTER_SIZE;
 				/* ((next used offset - current used offset) * 4096) - 4096 */
 			}
 			else 
@@ -330,29 +316,35 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 		//TODO: don't use together both c-style, c++ style io
 		fclose(f);
 
-	std::ifstream bitmapFile2("non_used.bitmap");
-	bitmapFile2.seekg(0, std::ios::end);
-	auto fileSize2 = bitmapFile2.tellg();
-	bitmapFile2.seekg(0, std::ios::beg);
+	std::ifstream nonUsedBitmapFile("non_used.bitmap");
 
-	std::string test;
+	nonUsedBitmapFile.seekg(0, std::ios::end);
+	auto nonUsedBitmapFileSize = nonUsedBitmapFile.tellg();
+	nonUsedBitmapFile.seekg(0, std::ios::beg);
+
 	std::vector<int>readnonfileVector;
-	readnonfileVector.reserve(fileSize2 * 8);
+	readnonfileVector.reserve(nonUsedBitmapFileSize * 8);
 		
 
 		int temp;
 
-		while (bitmapFile2 >> temp)
+		while (nonUsedBitmapFile >> temp)
 		{
 			readnonfileVector.push_back(temp);
 		}
 
 	std::sort(readnonfileVector.begin(), readnonfileVector.end());
+
 	HANDLE DISK = CreateFile(L"test.rec", GENERIC_READ | GENERIC_WRITE , FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_ALWAYS, 0, NULL);
-	HANDLE VSSDISK = CreateFile(L"result.raw", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+	// used + nonused
+	HANDLE VSSDISK = CreateFile(destinationPath.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+
+
 	LARGE_INTEGER inputFileSize;
 	LARGE_INTEGER tempoffset;
-	LARGE_INTEGER newoffset;
+
+	LARGE_INTEGER newoffset; //debug
+
 	tempoffset.QuadPart = 0;
 	GetFileSizeEx(VSSDISK, &inputFileSize);
 
@@ -386,5 +378,6 @@ void SystemBackup::exportResultFile(std::wstring bitmapFileName)
 		
 
 	}
-
+	CloseHandle(VSSDISK);
+	CloseHandle(DISK);
 }

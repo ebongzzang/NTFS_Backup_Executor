@@ -7,10 +7,10 @@
 class SystemBackup : public Backup
 {
 public:
-	SystemBackup(long _backupKey, std::string _sourcePath, std::string _destinationPath,
+	SystemBackup(long _backupKey, std::wstring _sourcePath, std::wstring _destinationPath,
 	bool _isCompressed, bool _isSplited);
-	virtual PlanB::JobStatus exec();
-//	virtual PlanB::JobStatus cancel();
+	virtual PlanB::BackupResult*  exec();
+	virtual PlanB::JobStatus cancel();
 	virtual ~SystemBackup();
 
 private:

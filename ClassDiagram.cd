@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Comment CommentText="Backup Output">
+    <Position X="4.479" Y="3.177" Height="0.312" Width="1.075" />
+  </Comment>
+  <Class Name="Backup" Collapsed="true">
+    <Position X="1.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CgBAEAAAAAAIAAAADAAgAAACABAiAAAAAAAQAAAAABA=</HashCode>
+      <FileName>backup.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FileBackup" Collapsed="true">
+    <Position X="0.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABQAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>FileBackup.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SystemBackup" Collapsed="true">
+    <Position X="2.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAQAAAAAABgAQBAAAAQAABAAAEAAQAAAICEA=</HashCode>
+      <FileName>SystemBackup.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Restore" Collapsed="true">
+    <Position X="6.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AARhAAAAAAQAAAIAAAAiAAABAAAFAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>Restore.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SystemRestore" Collapsed="true">
+    <Position X="6.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACQAAAAAAA=</HashCode>
+      <FileName>SystemRestore.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BackupExecutor" Collapsed="true">
+    <Position X="6.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIIAAAAAAgQAAKABAAAAAIAAAUAAAAAAA=</HashCode>
+      <FileName>BackupExecutor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RestoreExecutor" Collapsed="true">
+    <Position X="1.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAEAAAAABAAAAAAAIAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>RestoreExecutor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IVHD" Collapsed="true">
+    <Position X="7.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>0AEAAAAAAAAAEAAAgAAgAAAAAAACIEAAIAAAAAAAAAA=</HashCode>
+      <FileName>IVHD.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="VHD" Collapsed="true">
+    <Position X="6" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAGYgAQAAAAAEABAAAAQAAAAAAICAEAAAhCAIAAAAAA=</HashCode>
+      <FileName>VHD.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="PlanB::BackupResult" Collapsed="true">
+    <Position X="4.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQhAAAAAAQAAAAAAAAgAAAAAAAFAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PlanBCommon.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="PlanB::BackupType" Collapsed="true">
+    <Position X="14.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAIAAAAAAAAAAAAAAAAAEAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>PlanBCommon.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="PlanB::JobStatus" Collapsed="true">
+    <Position X="13" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAACAAAAAAAAAAACAABAEAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>PlanBCommon.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="PlanB::BackupStyle" Collapsed="true">
+    <Position X="13" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAABAAAAAAAA=</HashCode>
+      <FileName>PlanBCommon.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="PlanB::BackupAdapter" Collapsed="true">
+    <Position X="11.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAgABAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PlanBCommon.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="enumVhdType" Collapsed="true">
+    <Position X="11.25" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAACAAAAAAA=</HashCode>
+      <FileName>VHD.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Arial" Size="9" />
+</ClassDiagram>

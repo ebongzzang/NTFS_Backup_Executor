@@ -155,22 +155,31 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Backup.cpp" />
+    <ClCompile Include="FileBackup.cpp" />
     <ClCompile Include="IVHD.cpp" />
     <ClCompile Include="BackupExecutor.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Restore.cpp" />
+    <ClCompile Include="RestoreExecutor.cpp" />
     <ClCompile Include="SystemBackup.cpp" />
+    <ClCompile Include="SystemRestore.cpp" />
     <ClCompile Include="VHD.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="backup.h" />
+    <ClInclude Include="FileBackup.h" />
     <ClInclude Include="IVHD.h" />
     <ClInclude Include="BackupExecutor.h" />
     <ClInclude Include="PlanBCommon.h" />
     <ClInclude Include="Restore.h" />
+    <ClInclude Include="RestoreExecutor.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SystemBackup.h" />
+    <ClInclude Include="SystemRestore.h" />
     <ClInclude Include="VHD.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

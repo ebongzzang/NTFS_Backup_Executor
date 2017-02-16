@@ -1,8 +1,8 @@
 #include "backup.h"
 #include <string>
 #include <iostream>
-
-Backup::Backup(long _backupKey, std::string _sourcePath, std::string _destinationPath,
+#include <codecvt>
+Backup::Backup(long _backupKey, std::wstring _sourcePath, std::wstring _destinationPath,
 	bool _isCompressed, bool _isSplited) : backupKey(_backupKey), sourcePath(_sourcePath),
 	destinationPath(_destinationPath), isCompressed(_isCompressed), isSplited(_isSplited)
 {
@@ -13,8 +13,15 @@ Backup::~Backup()
 {
 
 }
+void Backup::compress()
+{
+	/*Not Implemented */
+}
 
-
+void Backup::split()
+{
+	/*Not Implemented */
+}
 VSS_SNAPSHOT_PROP Backup::takeSnapshot()
 {
 	std::wstring driveLetter;
@@ -39,7 +46,7 @@ VSS_SNAPSHOT_PROP Backup::takeSnapshot()
 	_CreateVssBackupComponentsInternal CreateVssBackupComponentsInternal_I;
 	_VssFreeSnapshotPropertiesInternal VssFreeSnapshotPropertiesInternal_I;
 	
-	driveLetter = strTowstr(sourcePath + ":\\");
+	driveLetter = strTowstr(wstrTostr(sourcePath) + ":\\");
 
 	HMODULE vssapiBase = LoadLibrary(L"vssapi.dll");
 	CreateVssBackupComponentsInternal_I = (_CreateVssBackupComponentsInternal)GetProcAddress(vssapiBase, "CreateVssBackupComponentsInternal"); //linking function
@@ -100,6 +107,13 @@ std::wstring Backup::strTowstr(const std::string& s)
 	std::wstring r(buf);
 	delete[] buf;
 	return r;
+}
+string Backup::wstrTostr(const std::wstring& wstr)
+{
+	using convert_typeX = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+	return converterX.to_bytes(wstr);
 }
 
 std::wstring Backup::convertDriveLettertoUNC(std::string dLetter)

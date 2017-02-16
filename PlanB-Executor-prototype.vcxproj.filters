@@ -1,16 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="BackupExecutor.cpp">
-      <Filter>소스</Filter>
-    </ClCompile>
-    <ClCompile Include="IVHD.cpp">
-      <Filter>소스</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>소스</Filter>
-    </ClCompile>
-    <ClCompile Include="VHD.cpp">
       <Filter>소스</Filter>
     </ClCompile>
     <ClCompile Include="Backup.cpp">
@@ -19,20 +10,29 @@
     <ClCompile Include="SystemBackup.cpp">
       <Filter>소스\Backup</Filter>
     </ClCompile>
+    <ClCompile Include="FileBackup.cpp">
+      <Filter>소스\Backup</Filter>
+    </ClCompile>
+    <ClCompile Include="BackupExecutor.cpp">
+      <Filter>소스\Executor</Filter>
+    </ClCompile>
+    <ClCompile Include="RestoreExecutor.cpp">
+      <Filter>소스\Executor</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemRestore.cpp">
+      <Filter>소스\Restore</Filter>
+    </ClCompile>
     <ClCompile Include="Restore.cpp">
       <Filter>소스\Restore</Filter>
     </ClCompile>
+    <ClCompile Include="IVHD.cpp">
+      <Filter>소스\VHD</Filter>
+    </ClCompile>
+    <ClCompile Include="VHD.cpp">
+      <Filter>소스\VHD</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BackupExecutor.h">
-      <Filter>헤더</Filter>
-    </ClInclude>
-    <ClInclude Include="IVHD.h">
-      <Filter>헤더</Filter>
-    </ClInclude>
-    <ClInclude Include="VHD.h">
-      <Filter>헤더</Filter>
-    </ClInclude>
     <ClInclude Include="PlanBCommon.h">
       <Filter>헤더\common</Filter>
     </ClInclude>
@@ -45,8 +45,26 @@
     <ClInclude Include="SystemBackup.h">
       <Filter>헤더\Backup</Filter>
     </ClInclude>
+    <ClInclude Include="FileBackup.h">
+      <Filter>헤더\Backup</Filter>
+    </ClInclude>
+    <ClInclude Include="BackupExecutor.h">
+      <Filter>헤더\Executor</Filter>
+    </ClInclude>
+    <ClInclude Include="RestoreExecutor.h">
+      <Filter>헤더\Executor</Filter>
+    </ClInclude>
     <ClInclude Include="Restore.h">
       <Filter>헤더\Restore</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemRestore.h">
+      <Filter>헤더\Restore</Filter>
+    </ClInclude>
+    <ClInclude Include="IVHD.h">
+      <Filter>헤더\VHD</Filter>
+    </ClInclude>
+    <ClInclude Include="VHD.h">
+      <Filter>헤더\VHD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -71,5 +89,20 @@
     <Filter Include="헤더\Restore">
       <UniqueIdentifier>{fa68c263-27bd-4592-93cc-591a251cc5da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더\Executor">
+      <UniqueIdentifier>{bee8fd39-8278-41f2-a676-aa33d7d9c549}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더\VHD">
+      <UniqueIdentifier>{80f883f2-ffe3-4c87-b1f3-53c19482b8e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스\Executor">
+      <UniqueIdentifier>{48ba1362-1ef5-4669-81fe-eeb0b9eb8b37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스\VHD">
+      <UniqueIdentifier>{dd87cfbf-9d41-424a-a115-2dbb145f1ff3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

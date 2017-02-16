@@ -6,6 +6,7 @@
 #include <bitset>
 #include <sstream>
 #include "SystemBackup.h"
+#include "RestoreExecutor.h"
 
 
 #define NOT_USED_CLUSTER 4096 *8
@@ -30,20 +31,17 @@ int main(void)
 	//char * readBuffer1 = new char[4096];
 	clock_t begin, end;
 	begin = clock();
-	BackupExecutor * executor = new BackupExecutor(01,"O",PlanB::BackupStyle::FULL,PlanB::BackupType::System,FALSE,FALSE);
+
+	BackupExecutor * BackupEx= new BackupExecutor(01,"Q",PlanB::BackupStyle::FULL,PlanB::BackupType::System,FALSE, FALSE);
+	BackupResult * result;
+	result = new BackupResult;
+	BackupEx->exec();
+	RestoreExecutor * RestoreEx = new RestoreExecutor(result);
 	end = clock();
 
 	std::cout << "수행시간 " << ((end - begin) / CLOCKS_PER_SEC) << "초" << std::endl;
 
 
-	//executor->setDiskHandle();
-
-	//readBuffer1 = manager->readMBR();
-
-	//for (int i = 0; i < 512; i++)
-	//{
-	//	std::cout << readBuffer1[i] << std::endl;
-	//}
 
 
 
