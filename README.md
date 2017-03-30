@@ -23,11 +23,11 @@ NTFS 드라이브 상에서 VSS(Volume Shadow Copy Service)를 이용한 Incremental, Diffr
 
 Executor - 싱글톤, 각각의 Executor가 백업과 복원을 지시
 
-SystemBackup - MFT를 포함하여 백업
+SystemBackup.cpp - MFT를 포함하여 백업
 
 FileBackup - 단순 파일 백업 (not-implemented)
 
-SystemRestore - SystemBackup의 결과물인 Backup Information Result Struct를 받아 복구
+SystemRestore.cpp - SystemBackup의 결과물인 Backup Information Result Struct를 받아 복구
 
 
 ![alt tag](https://github.com/ebongzzang/NTFS_Backup_Executor/blob/master/NTFS_Backup_Executor_CD.png)
