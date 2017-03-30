@@ -154,29 +154,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Backup.cpp" />
-    <ClCompile Include="FileBackup.cpp" />
-    <ClCompile Include="IVHD.cpp" />
-    <ClCompile Include="BackupExecutor.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Restore.cpp" />
-    <ClCompile Include="RestoreExecutor.cpp" />
-    <ClCompile Include="SystemBackup.cpp" />
-    <ClCompile Include="SystemRestore.cpp" />
-    <ClCompile Include="VHD.cpp" />
+    <ClCompile Include="src\Backup.cpp" />
+    <ClCompile Include="src\BackupExecutor.cpp" />
+    <ClCompile Include="src\FileBackup.cpp" />
+    <ClCompile Include="src\IVHD.cpp" />
+    <ClCompile Include="src\Restore.cpp" />
+    <ClCompile Include="src\RestoreExecutor.cpp" />
+    <ClCompile Include="src\SystemBackup.cpp" />
+    <ClCompile Include="src\SystemRestore.cpp" />
+    <ClCompile Include="src\VHD.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="backup.h" />
-    <ClInclude Include="FileBackup.h" />
-    <ClInclude Include="IVHD.h" />
-    <ClInclude Include="BackupExecutor.h" />
-    <ClInclude Include="PlanBCommon.h" />
-    <ClInclude Include="Restore.h" />
-    <ClInclude Include="RestoreExecutor.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="SystemBackup.h" />
-    <ClInclude Include="SystemRestore.h" />
-    <ClInclude Include="VHD.h" />
+    <ClInclude Include="src\backup.h" />
+    <ClInclude Include="src\BackupExecutor.h" />
+    <ClInclude Include="src\FileBackup.h" />
+    <ClInclude Include="src\IVHD.h" />
+    <ClInclude Include="src\PlanBCommon.h" />
+    <ClInclude Include="src\Restore.h" />
+    <ClInclude Include="src\RestoreExecutor.h" />
+    <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\SystemBackup.h" />
+    <ClInclude Include="src\SystemRestore.h" />
+    <ClInclude Include="src\VHD.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

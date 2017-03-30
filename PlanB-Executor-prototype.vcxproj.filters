@@ -4,66 +4,66 @@
     <ClCompile Include="main.cpp">
       <Filter>소스</Filter>
     </ClCompile>
-    <ClCompile Include="Backup.cpp">
+    <ClCompile Include="src\Backup.cpp">
       <Filter>소스\Backup</Filter>
     </ClCompile>
-    <ClCompile Include="SystemBackup.cpp">
+    <ClCompile Include="src\FileBackup.cpp">
       <Filter>소스\Backup</Filter>
     </ClCompile>
-    <ClCompile Include="FileBackup.cpp">
+    <ClCompile Include="src\SystemBackup.cpp">
       <Filter>소스\Backup</Filter>
     </ClCompile>
-    <ClCompile Include="BackupExecutor.cpp">
+    <ClCompile Include="src\BackupExecutor.cpp">
       <Filter>소스\Executor</Filter>
     </ClCompile>
-    <ClCompile Include="RestoreExecutor.cpp">
+    <ClCompile Include="src\RestoreExecutor.cpp">
       <Filter>소스\Executor</Filter>
     </ClCompile>
-    <ClCompile Include="SystemRestore.cpp">
+    <ClCompile Include="src\SystemRestore.cpp">
       <Filter>소스\Restore</Filter>
     </ClCompile>
-    <ClCompile Include="Restore.cpp">
+    <ClCompile Include="src\Restore.cpp">
       <Filter>소스\Restore</Filter>
     </ClCompile>
-    <ClCompile Include="IVHD.cpp">
+    <ClCompile Include="src\IVHD.cpp">
       <Filter>소스\VHD</Filter>
     </ClCompile>
-    <ClCompile Include="VHD.cpp">
+    <ClCompile Include="src\VHD.cpp">
       <Filter>소스\VHD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PlanBCommon.h">
+    <ClInclude Include="src\backup.h">
+      <Filter>헤더\Backup</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileBackup.h">
+      <Filter>헤더\Backup</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SystemBackup.h">
+      <Filter>헤더\Backup</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PlanBCommon.h">
       <Filter>헤더\common</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="src\stdafx.h">
       <Filter>헤더\common</Filter>
     </ClInclude>
-    <ClInclude Include="backup.h">
-      <Filter>헤더\Backup</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemBackup.h">
-      <Filter>헤더\Backup</Filter>
-    </ClInclude>
-    <ClInclude Include="FileBackup.h">
-      <Filter>헤더\Backup</Filter>
-    </ClInclude>
-    <ClInclude Include="BackupExecutor.h">
+    <ClInclude Include="src\BackupExecutor.h">
       <Filter>헤더\Executor</Filter>
     </ClInclude>
-    <ClInclude Include="RestoreExecutor.h">
+    <ClInclude Include="src\RestoreExecutor.h">
       <Filter>헤더\Executor</Filter>
     </ClInclude>
-    <ClInclude Include="Restore.h">
+    <ClInclude Include="src\Restore.h">
       <Filter>헤더\Restore</Filter>
     </ClInclude>
-    <ClInclude Include="SystemRestore.h">
+    <ClInclude Include="src\SystemRestore.h">
       <Filter>헤더\Restore</Filter>
     </ClInclude>
-    <ClInclude Include="IVHD.h">
+    <ClInclude Include="src\IVHD.h">
       <Filter>헤더\VHD</Filter>
     </ClInclude>
-    <ClInclude Include="VHD.h">
+    <ClInclude Include="src\VHD.h">
       <Filter>헤더\VHD</Filter>
     </ClInclude>
   </ItemGroup>

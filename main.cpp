@@ -32,7 +32,7 @@ int main(void)
 	clock_t begin, end;
 	begin = clock();
 
-	BackupExecutor * BackupEx= new BackupExecutor(01,"Q",PlanB::BackupStyle::FULL,PlanB::BackupType::System,FALSE, FALSE);
+	BackupExecutor * BackupEx= new BackupExecutor(01,"A",PlanB::BackupStyle::FULL,PlanB::BackupType::System,FALSE, FALSE);
 	BackupResult * result;
 	result = new BackupResult;
 	BackupEx->exec();
